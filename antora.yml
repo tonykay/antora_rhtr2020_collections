@@ -1,0 +1,6 @@
+name: rhtr2020_collections
+title: RHTR 2020 Collections Lab
+version: 1.0
+start_page: ROOT:overview.adoc
+nav:
+  - modules/ROOT/nav.adoc

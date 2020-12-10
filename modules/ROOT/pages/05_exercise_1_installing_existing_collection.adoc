@@ -1,0 +1,165 @@
+:GUID: %guid%
+:OSP_DOMAIN: dynamic.opentlc.com
+:TOWER_URL: %tower_url%
+:TOWER_ADMIN_USER: %tower_admin_user%
+:TOWER_ADMIN_PASSWORD: %tower_admin_password%
+:SSH_COMMAND: %ssh_command%
+:SSH_PASSWORD: %ssh_password%
+:VSCODE_UI_URL: %vscode_ui_url%
+:VSCODE_UI_PASSWORD: %vscode_ui_password%
+:organization_name: Default
+:gitlab_project: ansible/gitops-lab
+:project_prod: Project gitOps - Prod
+:project_test: Project gitOps - Test
+:inventory_prod: GitOps inventory - Prod Env
+:inventory_test: GitOps inventory - Test Env
+:credential_machine: host_credential
+:credential_git: gitlab_credential
+:credential_git_token: gitlab_token 
+:credential_openstack: cloud_credential
+:jobtemplate_prod: App deployer - Prod Env
+:jobtemplate_test: App deployer - Test Env
+:source-linenums-option:        
+:markup-in-source: verbatim,attributes,quotes
+:show_solution: tru
+
+
+== Installing an Existing Collection
+
+In this section we will *not* explore the excellent, supported, content on Ansible Automation Hub but rather work with the upstream collection `awx.awx` from Ansible Galaxy.
+This simplifies, in limited lab time, setting up Automation Hub credentials etc.
+However if you already have these and are comfortable using *Automation Hub* then the next 2 sections can be completed using the official `ansible.tower` collection in place of `awx.awx.`
+
+Good starting points to working with Automation Hub are here:
+
+* link:https://www.ansible.com/blog/now-available-the-new-ansible-content-collections-on-automation-hub[Now Available: Red Hat-Maintained Content Collections on Automation Hub]
+* link:https://www.ansible.com/blog/getting-started-with-automation-hub[Getting Started With Automation Hub]
+
+Now let's install the `awx.awx` collection and explore it briefly.
+
+. Browse to https://galaxy.ansible.com/awx/awx and examine the `awx.awx` collections page
+
+. Install the `awx.awx` collection 
++
+
+[source,sh]
+----
+$ ansible-galaxy collection install awx.awx
+----
++
+
+.Sample Output
+[source,texinfo]
+----
+Process install dependency map
+Starting collection install process
+Installing 'awx.awx:15.0.1' to '/home/devops/.ansible/collections/ansible_collections/awx/awx'
+----
++
+
+NOTE: Notice that the `awx.awx` collection has been installed at the default location.
+The `devops` user's `~/.ansible/collections` directory.
+This allows all projects on your control node to find and use it.
+
+. Explore the collection via the tree command, in particular the `tree ~/.ansible/collections/ansible_collections/awx/awx/plugins/modules` directory
++
+
+[source,sh]
+----
+$ tree ~/.ansible/collections/ansible_collections/awx/awx/plugins/modules
+----
++
+
+.Sample Output
+[source,texinfo]
+----
+/home/devops/.ansible/collections/ansible_collections/awx/awx/plugins/modules
+├── __init__.py
+├── tower_ad_hoc_command_cancel.py
+├── tower_ad_hoc_command.py
+├── tower_ad_hoc_command_wait.py
+├── tower_application.py
+├── tower_credential_input_source.py
+├── tower_credential.py
+├── tower_credential_type.py
+├── tower_export.py
+├── tower_group.py
+├── tower_host.py
+├── tower_import.py
+├── tower_instance_group.py
+├── tower_inventory.py
+├── tower_inventory_source.py
+├── tower_inventory_source_update.py
+├── tower_job_cancel.py
+├── tower_job_launch.py
+├── tower_job_list.py
+├── tower_job_template.py
+├── tower_job_wait.py
+├── tower_label.py
+├── tower_license.py
+├── tower_meta.py
+├── tower_notification_template.py
+├── tower_organization.py
+├── tower_project.py
+├── tower_project_update.py
+├── tower_receive.py
+├── tower_role.py
+├── tower_schedule.py
+├── tower_send.py
+├── tower_settings.py
+├── tower_team.py
+├── tower_token.py
+├── tower_user.py
+├── tower_workflow_job_template_node.py
+├── tower_workflow_job_template.py
+├── tower_workflow_launch.py
+└── tower_workflow_template.py
+----
++
+
+Ansible already has a number of, depreciated, modules with the same names as some of those above. Let's explore how to see the differences with `ansible-doc`.
+
+. Use `ansible-doc` to look up the `tower_project` module
+
++
+[source,sh]
+----
+$ ansible-doc tower_project
+----
++
+
+.Sample Output
+[source,texinfo]
+----
+> TOWER_PROJECT    (/usr/lib/python2.7/site-packages/ansible/modules/web_infrastructure/ansible_tower/tower_project.py)
+
+<OUTPUT OMITTED>
+----
++ 
+
+The path given in the output confirms that this is the original *Ansible* `tower_project`. 
+Fortunately again we can use `ansible-doc` command with the *FQCNs*.
+
+. Retry the `ansible-doc` command, but this time using the *FQCN*
+
++
+[source,sh]
+----
+$ ansible-doc awx.awx.tower_project
+----
++
+
+.Sample Output
+[source,texinfo]
+----
+> TOWER_PROJECT    (/home/devops/.ansible/collections/ansible_collections/awx/awx/plugins/modules/tower_project.py)
+
+<OUTPUT OMITTED>
+----
++
+
+This time we see the newer, and more fully featured, `awx.awx` module.
+
+A good introduction to the `awx.awx` *collection* can be found on the Ansible Insider Blog written by Bianca Henderson link:https://www.ansible.com/blog/introducing-the-awx-collection[Introducing: The AWX and Ansible Tower Collections]
+
+In the next section you will construct a Tower Configuration playbook using the `awx.awx` collection.
